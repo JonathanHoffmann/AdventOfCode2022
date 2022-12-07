@@ -21,8 +21,15 @@ public class ElfDirectory {
 
     public void addContent(Object newContent) {
         content.add(newContent);
+        size = 0; // reset size when adding new content
     }
 
+    public String getName() {
+        return name;
+    }
+
+    // Recursive function to index the size of folders in the filesystem.
+    // Without change, indexing does not have to be repeated.
     public int getSize() {
         if (size == 0) {
             for (Object o : content) {
@@ -36,25 +43,11 @@ public class ElfDirectory {
                     System.err.println("Object neither file or directory");
                 }
             }
-            if (size <= 100000) {
-                single.addFilesBelowSize(size);
-            }
-            if (size < single.getSmallestToDelete().size && size >= 1412830) // I hardcoded the missing space to not
-                                                                             // change my code here. this is not nice
-                                                                             // and only works because I already knew
-                                                                             // the total size from previous runs. Don't
-                                                                             // code like this!
-            {
-                single.setSmallestToDelete(this);
-            }
         }
         return size;
     }
 
-    public String getName() {
-        return name;
-    }
-
+    // Finding a nested folder. Used when CDing into a subfolder
     public ElfDirectory findFolder(String n) {
         for (Object o : content) {
             if (o instanceof ElfDirectory) {
@@ -62,18 +55,49 @@ public class ElfDirectory {
                 if (e.getName().equals(n)) {
                     return e;
                 }
-            } else if (o instanceof ElfFile) {
-                // Skipping file
-            } else {
-                System.err.println("Object neither file or directory");
             }
         }
         System.out.println("No folder called " + n + " in " + name + "!");
         return this;
     }
 
+    // Recursive function to find the answer to task 1
+    // Finding all folders with a size of less than a given amount
+    public void findDirectoriesUnderSize(int maxSize) {
+        // Recur this function for subfolders.
+        for (Object o : content) {
+            if (o instanceof ElfDirectory) {
+                ElfDirectory ed = (ElfDirectory) o;
+                ed.findDirectoriesUnderSize(maxSize);
+            }
+        }
+        // Index size if not indexed
+        if (this.getSize() <= maxSize) {
+            single.addFileBelowSize(size);
+        }
+    }
+
+    // Recursive function to find the answer to task 2
+    // Finding the smallest folder that gives enough space
+    public void findSmallestDirToDelete(int minSize) {
+        // Recur this function for subfolders.
+        for (Object o : content) {
+            if (o instanceof ElfDirectory) {
+                ElfDirectory ed = (ElfDirectory) o;
+                ed.findSmallestDirToDelete(minSize);
+            }
+        }
+        // Index size if not indexed
+        if (this.getSize() < single.getSmallestToDelete().size && size >= minSize) {
+            single.setSmallestToDelete(this);
+        }
+    }
+
     @Override
     public String toString() {
-        return name + " Size: " + size;
+        if (size == 0) {
+            this.getSize();
+        }
+        return "Folder: " + name + " Size: " + single.getFormat().format(size);
     }
 }
