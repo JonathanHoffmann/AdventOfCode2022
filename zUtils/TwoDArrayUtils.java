@@ -36,5 +36,14 @@ public class TwoDArrayUtils {
         }
         return count;
     }
-
+    public static Character[][] changeCharTo(Character[][] s, Character cOld, Character cNew) {
+        for (int i = 0; i < s.length; i++) {
+            for (int j = 0; j < s[0].length; j++) {
+                if (s[i][j] == cOld) {
+                    s[i][j] = cNew;
+                }
+            }
+        }
+        return s;
+    }
 }
