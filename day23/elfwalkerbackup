@@ -1,0 +1,205 @@
+package day23;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import Utils.TwoDArrayUtils;
+
+public class ElfWalker {
+    public static Character[][] map;
+
+    public static void main(String[] args) throws FileNotFoundException {
+        Integer direction = 0;
+        Scanner sc = new Scanner(new File("day23/inputEx.txt"));
+        ArrayList<String> inputs = new ArrayList<>();
+        while (sc.hasNextLine()) {
+            inputs.add(sc.nextLine());
+        }
+        map = new Character[inputs.size() * 3][inputs.get(0).length() * 3];
+        map = Utils.TwoDArrayUtils.changeCharTo(map, null, '.');
+
+        for (int i = 0; i < inputs.size(); i++) {
+            for (int j = 0; j < inputs.get(0).length(); j++) {
+                map[i + inputs.size()][j + inputs.get(0).length()] = inputs.get(i).charAt(j);
+            }
+        }
+        /*
+         * try {
+         * TwoDArrayUtils.TwoDCharArrayToFile(map, "day23/out.txt");
+         * } catch (IOException e) {
+         * // TODO Auto-generated catch block
+         * e.printStackTrace();
+         * }
+         */
+
+        for (int count = 0; count < 10; count++) {
+            // loop through the map
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < map[0].length; j++) {
+                    // Finding elf
+                    if (map[i][j] == '#') {
+                        Boolean elfUp = true;
+                        Boolean elfDown = true;
+                        Boolean elfLeft = true;
+                        Boolean elfRight = true;
+
+                        if (map[i - 1][j] == '.' && map[i - 1][j - 1] == '.' && map[i - 1][j + 1] == '.') {
+                            elfUp = false;
+                        }
+                        if (map[i + 1][j] == '.' && map[i + 1][j - 1] == '.' && map[i + 1][j + 1] == '.') {
+                            elfDown = false;
+                        }
+                        if (map[i][j - 1] == '.' && map[i + 1][j - 1] == '.' && map[i - 1][j - 1] == '.') {
+                            elfLeft = false;
+                        }
+                        if (map[i][j + 1] == '.' && map[i + 1][j + 1] == '.' && map[i - 1][j + 1] == '.') {
+                            elfRight = false;
+                        }
+
+                        if (elfUp || elfDown || elfLeft || elfRight) {
+                            if (!elfUp) {
+                                map[i][j] = 'U';
+                            } else if (!elfDown) {
+                                map[i][j] = 'D';
+                            } else if (!elfLeft) {
+                                map[i][j] = 'L';
+                            } else if (!elfRight) {
+                                map[i][j] = 'R';
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < map[0].length; j++) {
+                    // Up
+                    if (map[i][j] == 'U') {
+                        switch(direction){
+                            case 0:
+                                checkMoveUp(i,j);
+                                break;
+                        }
+                    }
+                    // Down
+                    else if (map[i][j] == 'D') {
+
+                    }
+                    // Left
+                    else if (map[i][j] == 'L') {
+
+                    }
+                    // Right
+                    else if (map[i][j] == 'R') {
+
+                    }
+                }
+            }
+
+            try {
+                TwoDArrayUtils.TwoDCharArrayToFile(map, "day23/out.txt");
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            // Change direction at the end
+            direction++;
+            if (direction == 4) {
+                direction = 0;
+            }
+        }
+    }
+
+    public static void checkMoveUp(int i, int j) {
+        Boolean move = true;
+        if (map[i - 2][j] == 'D') {
+            move = false;
+            map[i - 2][j] = '#';
+        }
+        if (map[i - 1][j + 1] == 'L') {
+            move = false;
+            map[i - 1][j + 1] = '#';
+        }
+        if (map[i - 1][j - 1] == 'R') {
+            move = false;
+            map[i - 1][j - 1] = '#';
+        }
+        if (move) {
+            map[i][j] = '.';
+            map[i - 1][j] = '#';
+        } else {
+            map[i][j] = '#';
+        }
+    }
+
+    public static void checkMoveDown(int i, int j) {
+        Boolean move = true;
+        if (map[i + 2][j] == 'U') {
+            move = false;
+            map[i + 2][j] = '#';
+        }
+        if (map[i + 1][j + 1] == 'L') {
+            move = false;
+            map[i + 1][j + 1] = '#';
+        }
+        if (map[i + 1][j - 1] == 'R') {
+            move = false;
+            map[i + 1][j - 1] = '#';
+        }
+        if (move) {
+            map[i][j] = '.';
+            map[i + 1][j] = '#';
+        } else {
+            map[i][j] = '#';
+        }
+    }
+
+    public static void checkMoveLeft(int i, int j) {
+        Boolean move = true;
+        if (map[i + 1][j - 1] == 'U') {
+            move = false;
+            map[i + 1][j - 1] = '#';
+        }
+        if (map[i - 1][j - 1] == 'D') {
+            move = false;
+            map[i - 1][j - 1] = '#';
+        }
+        if (map[i][j - 2] == 'R') {
+            move = false;
+            map[i][j - 2] = '#';
+        }
+        if (move) {
+            map[i][j] = '.';
+            map[i][j - 1] = '#';
+        } else {
+            map[i][j] = '#';
+        }
+    }
+
+    public static void checkMoveRight(int i, int j) {
+        Boolean move = true;
+        if (map[i + 1][j + 1] == 'U') {
+            move = false;
+            map[i + 1][j + 1] = '#';
+        }
+        if (map[i - 1][j + 1] == 'D') {
+            move = false;
+            map[i - 1][j + 1] = '#';
+        }
+        if (map[i][j + 2] == 'L') {
+            move = false;
+            map[i][j + 2] = '#';
+        }
+        if (move) {
+            map[i][j] = '.';
+            map[i][j + 1] = '#';
+        } else {
+            map[i][j] = '#';
+        }
+    }
+}
